@@ -23,6 +23,7 @@ const port = 8000;
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://66c95d259d77677365ca965d--zesty-kitten-96034b.netlify.app'], 
   optionsSuccessStatus: 200,
+  creadentials:true
 };
 
 app.use(cors(corsOptions));
