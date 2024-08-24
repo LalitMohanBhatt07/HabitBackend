@@ -1,50 +1,39 @@
 const express = require('express');
-const app = express();
-const database = require('./database/database');
+const cors = require('cors');
 const habitRoutes = require('./routes/HabitRoutes');
-const cors=require('cors')
-const path = require('path');
+const database = require('./database/database');
+require('dotenv').config()
 
+const app = express();
+const port = 8000;
 
-const allowedOrigins = [
-  'http://localhost:3000', // Development URL
-  'https://habittrackerbylalit-iwpkr4j2a-lalits-projects-550a0518.vercel.app', // Production URL
-]
+// CORS Configuration
+app.use(cors({
+  origin: 'https://66c95d259d77677365ca965d--zesty-kitten-96034b.netlify.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-const PORT = 4000;
+// Middleware to handle preflight requests
+app.options('*', cors());
 
-app.use(
-  cors({   
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-      credentials:true
-  })
-)
+// Other middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, 'client/build')));
-app.use('/api/v1/', habitRoutes);
+// API routes
+app.use('/api/v1', habitRoutes);
 
-
-
+// Root route
 app.get('/', (req, res) => {
   res.send('You are in the root directory');
 });
 
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
-
+// Connect to the database
 database.connect();
 
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Start the server
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on ${process.env.PORT}`);
 });
